@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>firebase-backend</title>
+
+        <!-- Compiled and minified CSS -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+        />
+    </head>
+    <body>
+        <nav>
+            <div class="nav-wrapper #fb8c00 orange darken-1">
+                <a href="#" class="left brand-logo">Job Portal</a>
+                <ul id="nav-mobile" class="right">
+                    <li id="login">
+                        <a class="modal-trigger" href="#modal1">Login</a>
+                    </li>
+                    <li id="signup">
+                        <a class="modal-trigger" href="#modal2">Signup</a>
+                    </li>
+                    <!-- <li><a href="#modal3" class="modal-trigger">Update Profile</a></li> -->
+                    <li id="logout"><a onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Modal Trigger -->
+        <!-- <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a> -->
+
+        <!-- Modal Structure -->
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <h4>Login</h4>
+                <form
+                    id="loginForm"
+                    action="#"
+                    autocomplete="off"
+                    onsubmit="login(event)"
+                >
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="email..."
+                    />
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="password..."
+                    />
+                    <button
+                        class="btn waves-effect #fb8c00 orange darken-1"
+                        type="submit"
+                    >
+                        Submit
+                    </button>
+                </form>
+                <button
+                    class="waves-effect waves-light btn"
+                    onclick="loginWithGoogle()"
+                >
+                    Login with google
+                </button>
+            </div>
+        </div>
+
+        <div id="modal2" class="modal">
+            <div class="modal-content">
+                <h4>Signup</h4>
+                <form
+                    id="signupForm"
+                    action="#"
+                    autocomplete="off"
+                    onsubmit="signup(event)"
+                >
+                    <input
+                        type="email"
+                        id="signupEmail"
+                        placeholder="email..."
+                    />
+                    <input
+                        type="password"
+                        id="signupPassword"
+                        placeholder="password..."
+                    />
+                    <button
+                        class="btn waves-effect #fb8c00 orange darken-1"
+                        type="submit"
+                    >
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="modal3" class="modal">
+            <div class="modal-content">
+                <h4>Edit Your Details</h4>
+                <!-- <form action="#"> -->
+                <div class="file-field input-field">
+                    <div class="btn waves-effect #fb8c00 orange darken-1">
+                        <span>File</span>
+                        <input
+                            type="file"
+                            accept="images/*"
+                            onchange="uploadImage(event)"
+                        />
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text" />
+                    </div>
+                </div>
+                <!-- </form> -->
+                <form
+                    action="#"
+                    id="editProfile"
+                    autocomplete="off"
+                    onsubmit="updateUserProfile(event)"
+                >
+                    <input type="email" name="email" placeholder="email..." />
+                    <input type="text" name="name" placeholder="name..." />
+                    <input
+                        type="text"
+                        name="phone"
+                        placeholder="phone number..."
+                    />
+                    <input
+                        type="text"
+                        name="speciality"
+                        placeholder="specialization..."
+                    />
+                    <input
+                        type="text"
+                        name="portfolio"
+                        placeholder="portfolio url..."
+                    />
+                    <input
+                        type="text"
+                        name="experience"
+                        placeholder="experience..."
+                    />
+                    <button
+                        class="btn waves-effect #fb8c00 orange darken-1"
+                        type="submit"
+                    >
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="center">
+            <h1>Your Account Details</h1>
+            <img
+                width="150px"
+                height="150px"
+                class="circle"
+                id="profile-pic"
+                src="./assets/noimage.png"
+                alt="no image"
+            />
+            <div class="userDetails"></div>
+        </div>
+
+        <table class="highlight striped" style="display: none" id="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone No</th>
+                    <th>Specialization</th>
+                    <th>Experience</th>
+                    <th>Portfolio</th>
+                </tr>
+            </thead>
+
+            <tbody id="table-body"></tbody>
+        </table>
+
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var elems = document.querySelectorAll(".modal");
+                var instances = M.Modal.init(elems);
+            });
+        </script>
+
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+        <script>
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+                apiKey: "",
+                authDomain: "",
+                projectId: "",
+                storageBucket: "",
+                messagingSenderId: "",
+                appId: "",
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            const storage = firebase.storage();
+            const storageRef = storage.ref();
+        </script>
+        <script src="./scripts/auth.js"></script>
+        <script src="./scripts/firestore-db.js"></script>
+    </body>
+</html>
